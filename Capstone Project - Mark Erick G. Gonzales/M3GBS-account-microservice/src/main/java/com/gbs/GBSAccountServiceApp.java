@@ -31,10 +31,12 @@ public class GBSAccountServiceApp {
 		AccountResponse accountResponse = updateRestTemplate.getForObject(URLStringGetAccount, AccountResponse.class);
 
 		boolean fromAccountSuccess = false;
+		boolean found = false;
 		String sender = null;
 		for (Account account : accountResponse.getAccounts()) {
 			if (account.getUserName().equals(inputUserName)) {
-				if (account.getAccountNumber().equals(fAccNumber)) {
+				String accnumString = account.getAccountNumber();
+				if (accnumString.equals(fAccNumber)) {
 					double currBal = Double.parseDouble(account.getAccountBalance());
 					double newBal = currBal - sendAmt;
 					String newBalance = String.valueOf(newBal);
@@ -42,16 +44,18 @@ public class GBSAccountServiceApp {
 						if (currBal >= sendAmt) {
 							updateSender(fAccNumber, newBalance);
 							fromAccountSuccess = true;
+							found = true;
 						} else {
 							System.out.println("\n\nTransfer Failed. Insufficient Balance!");
 							System.exit(0);
 								}
 						}
-				else {
-					System.out.println("Transfer Failed! Please check your Account number.");
-					System.exit(0);
-				}
 			}
+			  
+		}
+		if (!found) {
+			  System.out.println("Transfer Failed! Please check your Account number.");
+			  System.exit(0); 
 		}
 
 		if (fromAccountSuccess) {
